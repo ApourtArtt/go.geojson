@@ -360,5 +360,46 @@ func TestGeometryScan(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestIsPointInPolygon(t *testing.T) {
+	pointInside := []float64{
+		21.054315235791364,
+		-0.5311377787994473,
+	}
+	pointOutside := []float64{
+		21.108783361479084,
+		-0.5104360685923695,
+	}
+	polygon := [][][]float64{
+		{
+			{
+				20.985922738506304,
+				-0.5019335211531626,
+			},
+			{
+				20.985922738506304,
+				-0.5884368635957316,
+			},
+			{
+				21.089435707370683,
+				-0.5884368635957316,
+			},
+			{
+				21.089435707370683,
+				-0.5019335211531626,
+			},
+			{
+				20.985922738506304,
+				-0.5019335211531626,
+			},
+		},
+	}
+
+	if IsPointInPolygon(pointInside, polygon) == false {
+		t.Errorf("the point is supposed to be inside the polygon")
+	}
+	if IsPointInPolygon(pointOutside, polygon) == true {
+		t.Errorf("the point is supposed to be outside of the polygon")
+	}
 }

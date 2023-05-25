@@ -353,3 +353,76 @@ func (g *Geometry) IsMultiPolygon() bool {
 func (g *Geometry) IsCollection() bool {
 	return g.Type == GeometryCollection
 }
+
+// IsPointInPolygon returns true if the point is in the polygon
+// The implementation comes from https://github.com/rowanwins/point-in-polygon-hao/blob/master/src/index.js
+// The difference being, this version is unsafe and the return value being true in case the point in at the edge
+func IsPointInPolygon(point []float64, polygon [][][]float64) bool {
+	k := 0
+
+	// Note: Might crash if badly used, no length check
+	x := point[0]
+	y := point[1]
+
+	numContours := len(polygon)
+	for i := 0; i < numContours; i++ {
+		contour := polygon[i]
+		contourLen := len(contour) - 1
+		currentPoly := contour[0]
+
+		u1 := currentPoly[0] - x
+		v1 := currentPoly[1] - y
+
+		for j := 0; j < contourLen; j++ {
+			nextPoly := contour[j+1]
+
+			v2 := nextPoly[1] - y
+
+			if (v1 < 0 && v2 < 0) || (v1 > 0 && v2 > 0) {
+				currentPoly = nextPoly
+				v1 = v2
+				u1 = currentPoly[0] - x
+				continue
+			}
+
+			u2 := nextPoly[0] - point[0]
+
+			if v2 > 0 && v1 <= 0 {
+				f := (u1 * v2) - (u2 * v1)
+				if f > 0 {
+					k++
+				} else if f == 0 {
+					return true
+				}
+			} else if v1 > 0 && v2 <= 0 {
+				f := (u1 * v2) - (u2 * v1)
+				if f < 0 {
+					k++
+				} else if f == 0 {
+					return true
+				}
+			} else if v2 == 0 && v1 < 0 {
+				f := (u1 * v2) - (u2 * v1)
+				if f == 0 {
+					return true
+				}
+			} else if v1 == 0 && v2 < 0 {
+				f := (u1 * v2) - (u2 * v1)
+				if f == 0 {
+					return true
+				}
+			} else if v1 == 0 && v2 == 0 {
+				if u2 <= 0 && u1 >= 0 {
+					return true
+				} else if u1 <= 0 && u2 >= 0 {
+					return true
+				}
+			}
+			currentPoly = nextPoly
+			v1 = v2
+			u1 = u2
+		}
+	}
+
+	return k%2 != 0
+}

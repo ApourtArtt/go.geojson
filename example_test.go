@@ -1,9 +1,7 @@
-package geojson_test
+package geojson
 
 import (
 	"fmt"
-
-	geojson "github.com/paulmach/go.geojson"
 )
 
 func ExampleUnmarshalFeatureCollection() {
@@ -17,7 +15,7 @@ func ExampleUnmarshalFeatureCollection() {
 		    ]
 		  }`)
 
-	fc, err := geojson.UnmarshalFeatureCollection(rawFeatureJSON)
+	fc, err := UnmarshalFeatureCollection(rawFeatureJSON)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
@@ -29,7 +27,7 @@ func ExampleUnmarshalFeatureCollection() {
 
 func ExampleUnmarshalGeometry() {
 	rawGeometryJSON := []byte(`{"type": "Point", "coordinates": [102.0, 0.5]}`)
-	g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
+	g, err := UnmarshalGeometry(rawGeometryJSON)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
@@ -40,8 +38,8 @@ func ExampleUnmarshalGeometry() {
 }
 
 func ExampleFeatureCollection_MarshalJSON() {
-	fc := geojson.NewFeatureCollection()
-	fc.AddFeature(geojson.NewPointFeature([]float64{1, 2}))
+	fc := NewFeatureCollection()
+	fc.AddFeature(NewPointFeature([]float64{1, 2}))
 	rawJSON, err := fc.MarshalJSON()
 	if err != nil {
 		fmt.Printf("error: %v", err)
